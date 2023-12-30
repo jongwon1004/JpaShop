@@ -118,6 +118,7 @@ public class OrderRepository {
                 .getResultList();
     }
 
+    // 재사용성이 높음, 공통으로 사용되거나 튜닝 가능성이 높음.
     public List<Order> findAllWithMemberDelivery(int offset, int limit) {
         return em.createQuery(
                         "select o from Order o" +
@@ -125,6 +126,16 @@ public class OrderRepository {
                                 " join fetch o.delivery d", Order.class)
                 .setFirstResult(offset)
                 .setMaxResults(limit)
+                .getResultList();
+    }
+
+    // 재사용성이 낮음, 쿼리 튜닝이 어려움, 로직이 너무 fit함, 하지만 성능적으로 조금이나마 이점이 있음, 
+    public List<OrderSimpleQueryDto> findOrderDtos() {
+        return em.createQuery(
+                        "select new jpashop.jpabook.jpashop.repository.OrderSimpleQueryDto(o.id, m.name, o.orderDate, o.status, d.address)" +
+                                " from Order o" +
+                                " join o.member m " +
+                                " join o.delivery d", OrderSimpleQueryDto.class)
                 .getResultList();
     }
 }

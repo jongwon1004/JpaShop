@@ -1,5 +1,6 @@
 package jpashop.jpabook.jpashop.api;
 
+import com.fasterxml.jackson.databind.module.SimpleDeserializers;
 import jpashop.jpabook.jpashop.domain.Address;
 import jpashop.jpabook.jpashop.domain.Order;
 import jpashop.jpabook.jpashop.domain.OrderStatus;
@@ -54,6 +55,19 @@ public class OrderSimpleApiController {
         return new Result(orderRepository.findAllByString(new OrderSearch()).stream()
                 .map(o -> new SimpleOrderDto(o))
                 .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/api/v3/simple-orders")
+    public Result ordersV3() {
+
+        return new Result(orderRepository.findAllWithMemberDelivery().stream() // join fetch
+                .map(o -> new SimpleOrderDto(o))
+                .collect(Collectors.toList()));
+    }
+
+    @GetMapping("/api/v4/simple-orders")
+    public Result ordersV4() {
+        return new Result(orderRepository.findOrderDtos());
     }
 
     @Data
