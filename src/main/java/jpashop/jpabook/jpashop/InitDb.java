@@ -56,12 +56,6 @@ public class InitDb {
 
         }
 
-        private static Delivery createDelivery(Member member) {
-            Delivery delivery = new Delivery();
-            delivery.setAddress(member.getAddress());
-            return delivery;
-        }
-
         public void dbInit2() {
             Member member = createMember("userB", "osaka", "street2", "555-555");
             em.persist(member);
@@ -79,6 +73,12 @@ public class InitDb {
             Order order = Order.createOrder(member, delivery, orderItem1, orderItem2);
             em.persist(order);
 
+        }
+
+        private static Delivery createDelivery(Member member) {
+            Delivery delivery = new Delivery();
+            delivery.setAddress(member.getAddress());
+            return delivery;
         }
 
         private static Book createBook(String name, int price, int stockQuantity) {
