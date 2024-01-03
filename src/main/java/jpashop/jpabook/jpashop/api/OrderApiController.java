@@ -6,13 +6,15 @@ import jpashop.jpabook.jpashop.domain.OrderItem;
 import jpashop.jpabook.jpashop.domain.OrderStatus;
 import jpashop.jpabook.jpashop.repository.OrderRepository;
 import jpashop.jpabook.jpashop.repository.OrderSearch;
+import jpashop.jpabook.jpashop.repository.order.query.OrderQueryDto;
+import jpashop.jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.*;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -21,6 +23,7 @@ import static java.util.stream.Collectors.*;
 public class OrderApiController {
 
     private final OrderRepository orderRepository;
+    private final OrderQueryRepository orderQueryRepository;
 
     @GetMapping("/api/v1/orders")
     public List<Order> ordersV1() {
@@ -47,11 +50,28 @@ public class OrderApiController {
     @GetMapping("/api/v3/orders")
     public Result ordersV3() {
 
-
         return new Result(orderRepository.findAllWithItem().stream()
                 .map(o -> new OrderDto(o))
                 .collect(toList()));
 
+    }
+
+    @GetMapping("/api/v3.1/orders")
+    public Result ordersV3_page(@RequestParam(value = "offset", defaultValue = "0") int offset,
+                                @RequestParam(value = "limit", defaultValue = "100") int limit) {
+
+
+        List<Order> orders = orderRepository.findAllWithMemberDelivery(offset, limit);
+        return new Result(orders.stream()
+                .map(o -> new OrderDto(o))
+                .collect(toList()));
+
+
+    }
+
+    @GetMapping("/api/v4/orders")
+    public Result<OrderQueryDto> ordersV4() {
+        return new Result(orderQueryRepository.findOrderQueryDtos());
     }
 
     @Data
