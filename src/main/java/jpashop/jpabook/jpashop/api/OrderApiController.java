@@ -10,10 +10,11 @@ import lombok.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,13 +38,20 @@ public class OrderApiController {
 
     @GetMapping("/api/v2/orders")
     public Result ordersV2() {
-        List<Order> orders = orderRepository.findAllByString(new OrderSearch());
-        List<OrderDto> collect = orders.stream()
+
+        return new Result(orderRepository.findAllByString(new OrderSearch()).stream()
+                .map(OrderDto::new)
+                .collect(toList()));
+    }
+
+    @GetMapping("/api/v3/orders")
+    public Result ordersV3() {
+
+
+        return new Result(orderRepository.findAllWithItem().stream()
                 .map(o -> new OrderDto(o))
-                .collect(Collectors.toList());
+                .collect(toList()));
 
-
-        return new Result(collect);
     }
 
     @Data
@@ -75,7 +83,7 @@ public class OrderApiController {
 
             orderItems = order.getOrderItems().stream()
                     .map(orderItem -> new OrderItemDto(orderItem))
-                    .collect(Collectors.toList());
+                    .collect(toList());
         }
     }
 

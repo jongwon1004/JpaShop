@@ -34,14 +34,14 @@ public class OrderRepository {
 
     public List<Order> findAllByString(OrderSearch orderSearch) {
 
-        String jpql = "select o from Order o join o.member m";
+        String jpql = "select o from Order o join o.member m"; // orderSearch 의 값이 비어있으면 모든 Order 조회
         boolean isFirstCondition = true;
 
         //주문 상태 검색
-        if (orderSearch.getOrderStatus() != null) {
+        if (orderSearch.getOrderStatus() != null) { // orderStatus 의 값이 있으면
             if (isFirstCondition) {
                 jpql += " where";
-                isFirstCondition = false;
+                isFirstCondition = false; // where o.status = :status
             } else {
                 jpql += " and";
             }
