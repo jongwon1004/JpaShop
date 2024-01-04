@@ -6,6 +6,7 @@ spring:
     url: jdbc:mysql://localhost:3306/jpashop
 
   jpa:
+    open-in-view: false
     database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
     hibernate:
