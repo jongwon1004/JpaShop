@@ -6,6 +6,8 @@ import jpashop.jpabook.jpashop.domain.OrderItem;
 import jpashop.jpabook.jpashop.domain.OrderStatus;
 import jpashop.jpabook.jpashop.repository.OrderRepository;
 import jpashop.jpabook.jpashop.repository.OrderSearch;
+import jpashop.jpabook.jpashop.repository.order.query.OrderFlatDto;
+import jpashop.jpabook.jpashop.repository.order.query.OrderItemQueryDto;
 import jpashop.jpabook.jpashop.repository.order.query.OrderQueryDto;
 import jpashop.jpabook.jpashop.repository.order.query.OrderQueryRepository;
 import lombok.*;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.*;
 
@@ -72,6 +75,26 @@ public class OrderApiController {
     @GetMapping("/api/v4/orders")
     public Result<OrderQueryDto> ordersV4() {
         return new Result(orderQueryRepository.findOrderQueryDtos());
+    }
+
+    @GetMapping("/api/v5/orders")
+    public Result<OrderQueryDto> ordersV5() {
+        return new Result(orderQueryRepository.findAllByDto_optimization());
+    }
+
+    @GetMapping("/api/v6/orders")
+    public Result<OrderQueryDto> ordersV6() {
+        List<OrderFlatDto> flats = orderQueryRepository.findAllByDto_flat();
+        return new Result(flats.stream()
+                .collect(groupingBy(o -> new OrderQueryDto(o.getOrderId(),
+                                o.getName(), o.getOrderDate(), o.getOrderStatus(), o.getAddress()),
+                        mapping(o -> new OrderItemQueryDto(o.getOrderId(),
+                                o.getItemName(), o.getOrderPrice(), o.getCount()), toList())
+                )).entrySet().stream()
+                .map(e -> new OrderQueryDto(e.getKey().getOrderId(),
+                        e.getKey().getName(), e.getKey().getOrderDate(), e.getKey().getOrderStatus(),
+                        e.getKey().getAddress(), e.getValue()))
+                .collect(Collectors.toList()));
     }
 
     @Data
